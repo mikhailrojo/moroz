@@ -106,7 +106,7 @@ navigator.mediaDevices.getUserMedia(localStreamConstraints)
 function gotStream(stream) {
   console.log('Adding local stream.');
   localStream = stream;
-  localVideo.srcObject = stream;
+  //localVideo.srcObject = stream;
   sendMessage('got user media', room);
   if (isInitiator) {
     maybeStart();
@@ -222,26 +222,3 @@ function stop() {
   pc.close();
   pc = null;
 }
-
-(async () => {
-  const deepAR = await deepar.initialize({
-    licenseKey: 'f46f49ed78f2a4bfe2d6775a29be434a354fcbb433c8df4d785ef7cb99f092624d56cf84b58c8b9a',
-    previewElement: document.querySelector('#deepar-div'),
-    effect: 'https://cdn.jsdelivr.net/npm/deepar/effects/aviators',
-  });
-
-  deepAR.callbacks.onFaceVisibilityChanged = (args) => {
-    // do something
-
-    console.log(args); // true / false
-  };
-
-
-
-
-  var canvas = document.querySelector('canvas');
-  var video = document.querySelector('#localVideo');
-  video.srcObject =  canvas.captureStream();
-
-  video.play();
-})()

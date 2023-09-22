@@ -89,8 +89,8 @@ body {
 		margin-bottom: 1rem!important;
 		margin-top: 0px!important;
 	}
-	
-	
+
+
 
 @media (orientation: landscape) {
 	.btn-danger {
@@ -103,7 +103,7 @@ body {
 		background-color: #25274d;
 		border-color: #25274d;
 	}
-		
+
 	.btn {
 		display:block;
 		font-size : 15px;
@@ -115,7 +115,7 @@ body {
 		background-color: #25274d;
 		border-color: #25274d;
 	}
-	
+
 	.btn_option {
 		display:block;
 		font-size : 15px;
@@ -126,38 +126,18 @@ body {
 		background-color: #25274d;
 		border-color: #25274d;
 	}
-	
-	
-	
+
+
+
 	#room_value {
 		margin-left: 20px;
 	}
-	
-	.local_div {
-		width:33%;
-		float:left
-	}
 
-	.remote_div {
-		width:33%;
-		float:left
-	}
 
-	.remote2_div {
-		width:33%;
-		float:left
-	}
 
-	#video_container {
-		display: flex;
-		width: 85%;
-		margin: auto;
-		height: 80% 
-	}
-	
-	video {
-		width:100%;
-	}
+
+
+
 
 }
 /* For Mobile */
@@ -264,7 +244,7 @@ body {
 		display:flex;
 		flex-wrap:wrap
 	}
-	
+
 	.remote_div video {
 		-ms-flex: 0 0 100%;
 		flex: 0 0 100%;
@@ -276,7 +256,7 @@ body {
 		flex: 0 0 100%;
 		max-width: 100%;
 	}
-	
+
 	.btn-danger {
 		font-size : 16px;
 		width: 100%;
@@ -285,9 +265,9 @@ body {
 		background-color: #25274d;
 		border-color: #25274d;
 	}
-	
+
 }
 
 
 
-	
+
