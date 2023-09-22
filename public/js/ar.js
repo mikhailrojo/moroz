@@ -6,14 +6,16 @@
   });
 
   deepAR.callbacks.onFaceVisibilityChanged = (args) => {
-    console.log(args); // true / false
+   // console.log(args); // true / false
   };
 
   const canvas = document.querySelector('canvas');
   const video = document.querySelector('#localVideo');
+  console.log('my strem is ready')
   const arStream = canvas.captureStream();
   video.srcObject =  arStream
- // pc.addStream(arStream);
+
+  window.AR_STREAM = arStream;
 
   video.play();
 })()

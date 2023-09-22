@@ -121,7 +121,9 @@ function maybeStart() {
   console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
   if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
+    console.log({isInitiator});
     createPeerConnection();
+    localStream = isInitiator ? window.AR_STREAM : localStream;
     pc.addStream(localStream);
     isStarted = true;
     console.log('isInitiator', isInitiator);
@@ -139,6 +141,7 @@ window.onbeforeunload = function() {
 
 //Creating peer connection
 function createPeerConnection() {
+  console.log('createPeerConnection')
   try {
     pc = new RTCPeerConnection(pcConfig);
     pc.onicecandidate = handleIceCandidate;
@@ -179,8 +182,7 @@ function doCall() {
 function doAnswer() {
   console.log('Sending answer to peer.');
   pc.createAnswer().then(
-    setLocalAndSendMessage,
-    onCreateSessionDescriptionError
+    setLocalAndSendMessage
   );
 }
 
@@ -190,9 +192,9 @@ function setLocalAndSendMessage(sessionDescription) {
   sendMessage(sessionDescription, room);
 }
 
-function onCreateSessionDescriptionError(error) {
-  trace('Failed to create session description: ' + error.toString());
-}
+// function onCreateSessionDescriptionError(error) {
+//   trace('Failed to create session description: ' + error.toString());
+// }
 
 
 function handleRemoteStreamAdded(event) {
