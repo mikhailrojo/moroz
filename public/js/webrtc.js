@@ -8,80 +8,84 @@ var localStream;
 var pc;
 var remoteStream;
 var turnReady;
+let audioTrack = null;
 
 //Initialize turn/stun server here
 var pcConfig = turnConfig;
 
-var localStreamConstraints = {
-    audio: true,
-    video: true
-  };
+const localStreamConstraints = {
+  audio: true,
+  video: true
+};
 
 
 //Not prompting for room name
 //var room = 'foo';
 
 // Prompting for room name:
-var room = prompt('Enter room name:');
+const room = prompt('Enter room name:');
 
 //Initializing socket.io
-var socket = io.connect();
+const socket = io.connect();
 
 if (room !== '') {
   socket.emit('create or join', room);
   console.log('Attempted to create or  join room', room);
 }
 
-//Defining socket connections for signalling
-socket.on('created', function(room) {
+// Эта новая команта
+socket.on('created', function (room) {
   console.log('Created room ' + room);
   isInitiator = true;
+  getMedia();
 });
 
-socket.on('full', function(room) {
+socket.on('full', function (room) {
   console.log('Room ' + room + ' is full');
 });
 
-socket.on('join', function (room){
+socket.on('join', function (room) {
   console.log('Another peer made a request to join room ' + room);
   console.log('This peer is the initiator of room ' + room + '!');
+  // кто-то еще сейчас присоединится!
   isChannelReady = true;
 });
 
-socket.on('joined', function(room) {
+socket.on('joined', function (room) {
   console.log('joined: ' + room);
+  // я присоединился к существующему каналу
   isChannelReady = true;
+  getMedia();
 });
 
-socket.on('log', function(array) {
+socket.on('log', function (array) {
   console.log.apply(console, array);
 });
 
 
 //Driver code
-socket.on('message', function(message, room) {
-    console.log('Client received message:', message,  room);
-    if (message === 'got user media') {
+socket.on('message', function (message, room) {
+  console.log('Client received message:', message, room);
+  if (message === 'got user media') {
+    maybeStart();
+  } else if (message.type === 'offer') {
+    if (!isInitiator && !isStarted) {
       maybeStart();
-    } else if (message.type === 'offer') {
-      if (!isInitiator && !isStarted) {
-        maybeStart();
-      }
-      pc.setRemoteDescription(new RTCSessionDescription(message));
-      doAnswer();
-    } else if (message.type === 'answer' && isStarted) {
-      pc.setRemoteDescription(new RTCSessionDescription(message));
-    } else if (message.type === 'candidate' && isStarted) {
-      var candidate = new RTCIceCandidate({
-        sdpMLineIndex: message.label,
-        candidate: message.candidate
-      });
-      pc.addIceCandidate(candidate);
-    } else if (message === 'bye' && isStarted) {
-      handleRemoteHangup();
     }
+    pc.setRemoteDescription(new RTCSessionDescription(message));
+    doAnswer();
+  } else if (message.type === 'answer' && isStarted) {
+    pc.setRemoteDescription(new RTCSessionDescription(message));
+  } else if (message.type === 'candidate' && isStarted) {
+    var candidate = new RTCIceCandidate({
+      sdpMLineIndex: message.label,
+      candidate: message.candidate
+    });
+    pc.addIceCandidate(candidate);
+  } else if (message === 'bye' && isStarted) {
+    handleRemoteHangup();
+  }
 });
-
 
 
 //Function to send message in a room
@@ -91,22 +95,25 @@ function sendMessage(message, room) {
 }
 
 
-
 //Displaying Local Stream and Remote Stream on webpage
-var localVideo = document.querySelector('#localVideo');
-var remoteVideo = document.querySelector('#remoteVideo');
-console.log("Going to find Local media");
-navigator.mediaDevices.getUserMedia(localStreamConstraints)
-.then(gotStream)
-.catch(function(e) {
-  alert('getUserMedia() error: ' + e.name);
-});
+const localVideo = document.querySelector('#localVideo');
+const remoteVideo = document.querySelector('#remoteVideo');
 
 //If found local stream
 function gotStream(stream) {
+  console.log({isInitiator})
   console.log('Adding local stream.');
   localStream = stream;
-  //localVideo.srcObject = stream;
+  localVideo.srcObject = stream;
+  stream.getTracks().forEach(track => {
+    if (track.kind === 'audio') {
+      audioTrack = track;
+      console.log(track)
+      console.log(track.getConstraints())
+      console.log(track.getSettings())
+      console.log(track.getCapabilities())
+    }
+  })
   sendMessage('got user media', room);
   if (isInitiator) {
     maybeStart();
@@ -118,12 +125,11 @@ console.log('Getting user media with constraints', localStreamConstraints);
 
 //If initiator, create the peer connection
 function maybeStart() {
-  console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
+  console.log('>>>>>>> maybeStart() ', isStarted, isChannelReady, isInitiator);
   if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
-    console.log({isInitiator});
     createPeerConnection();
-    localStream = isInitiator ? window.AR_STREAM : localStream;
+    // localStream = isInitiator ? window.AR_STREAM : localStream;
     pc.addStream(localStream);
     isStarted = true;
     console.log('isInitiator', isInitiator);
@@ -134,7 +140,7 @@ function maybeStart() {
 }
 
 //Sending bye if user closes the window
-window.onbeforeunload = function() {
+window.onbeforeunload = function () {
   sendMessage('bye', room);
 };
 
@@ -210,7 +216,7 @@ function handleRemoteStreamRemoved(event) {
 function hangup() {
   console.log('Hanging up.');
   stop();
-  sendMessage('bye',room);
+  sendMessage('bye', room);
 }
 
 function handleRemoteHangup() {
@@ -223,4 +229,18 @@ function stop() {
   isStarted = false;
   pc.close();
   pc = null;
+}
+
+
+
+function getMedia () {
+  if (isInitiator) {
+    return initDeepAr();
+  }
+
+  navigator.mediaDevices.getUserMedia(localStreamConstraints)
+    .then(gotStream)
+    .catch(function (e) {
+      alert('getUserMedia() error: ' + e.name);
+    });
 }
