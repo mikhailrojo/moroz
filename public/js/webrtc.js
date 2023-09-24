@@ -9,6 +9,7 @@ var pc;
 var remoteStream;
 var turnReady;
 let audioTrack = null;
+let inboundStream = null;
 
 //Initialize turn/stun server here
 var pcConfig = turnConfig;
@@ -105,15 +106,6 @@ function gotStream(stream) {
   console.log('Adding local stream.');
   localStream = stream;
   localVideo.srcObject = stream;
-  stream.getTracks().forEach(track => {
-    if (track.kind === 'audio') {
-      audioTrack = track;
-      console.log(track)
-      console.log(track.getConstraints())
-      console.log(track.getSettings())
-      console.log(track.getCapabilities())
-    }
-  })
   sendMessage('got user media', room);
   if (isInitiator) {
     maybeStart();
@@ -129,8 +121,14 @@ function maybeStart() {
   if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
-    // localStream = isInitiator ? window.AR_STREAM : localStream;
-    pc.addStream(localStream);
+    localStream.getTracks().forEach(track => {
+
+      // if (track.kind === 'video') return;
+      // console.log('tracks \n\n')
+      // console.log(track);
+      console.log('adding a track', track);
+      pc.addTrack(track, localStream)
+    })
     isStarted = true;
     console.log('isInitiator', isInitiator);
     if (isInitiator) {
@@ -147,11 +145,13 @@ window.onbeforeunload = function () {
 
 //Creating peer connection
 function createPeerConnection() {
-  console.log('createPeerConnection')
+  console.log('createPeerConnection', pcConfig);
   try {
+
     pc = new RTCPeerConnection(pcConfig);
     pc.onicecandidate = handleIceCandidate;
-    pc.onaddstream = handleRemoteStreamAdded;
+    pc.ontrack = handleTrackAdded;
+    pc.onstream = () => alert('stream!!!');
     pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
   } catch (e) {
@@ -203,10 +203,21 @@ function setLocalAndSendMessage(sessionDescription) {
 // }
 
 
-function handleRemoteStreamAdded(event) {
-  console.log('Remote stream added.');
-  remoteStream = event.stream;
-  remoteVideo.srcObject = remoteStream;
+function handleTrackAdded(ev) {
+console.log('\n\n handleTrackAdded \n\n', ev);
+
+
+  if (ev.streams && ev.streams[0]) {
+    remoteVideo.srcObject = ev.streams[0];
+
+    console.log(remoteVideo.srcObject.getTracks());
+  } else {
+    if (!inboundStream) {
+      inboundStream = new MediaStream();
+      remoteVideo.srcObject = inboundStream;
+    }
+    inboundStream.addTrack(ev.track);
+  }
 }
 
 function handleRemoteStreamRemoved(event) {

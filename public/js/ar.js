@@ -16,12 +16,28 @@ const initDeepAr = async () => {
   };
 
   const canvas = document.querySelector('canvas');
-  const video = document.querySelector('#localVideo');
+  const remoteVideo = document.querySelector('#localVideo');
   console.log('my strem is ready')
   const arStream = canvas.captureStream();
-  video.srcObject = arStream;
-  localStream = arStream;
-  maybeStart()
 
-  video.play();
+  const inboundStream = new MediaStream();
+  remoteVideo.srcObject = inboundStream;
+  inboundStream.addTrack(arStream.getTracks()[0]);
+
+  navigator.mediaDevices.getUserMedia({audio: true, video: true})
+    .then((stream) => {
+      const audioStream = stream.getAudioTracks();
+      console.log(audioStream);
+      inboundStream.addTrack(audioStream[0]);
+      maybeStart()
+      remoteVideo.play();
+    })
+    .catch(function (e) {
+      console.error('getUserMedia() error: ' + e);
+    });
+
+  localStream = inboundStream;
+
+
+
 }
