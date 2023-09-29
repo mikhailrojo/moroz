@@ -64,10 +64,10 @@ const hannWindow = function (length) {
   return window;
 };
 
-const getFilter =(audioContext) => {
-  const grainSize = 512;
-  const pitchRatio = 2;
-  const overlapRatio = 0.5;
+const getFilter = (audioContext) => {
+  const grainSize = 8192;
+  const pitchRatio = 0.8;
+  const overlapRatio = 0;
 
   const pitchShifterProcessor = audioContext.createScriptProcessor(grainSize, 1, 1);
   pitchShifterProcessor.buffer = new Float32Array(grainSize * 2);
