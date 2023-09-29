@@ -10,6 +10,7 @@ const initDeepAr = async () => {
   });
 
   deepAR.callbacks.onFaceVisibilityChanged = (isVisible) => {
+    console.log({isVisible, localStream});
     localStream && localStream.getTracks().forEach(track => {
       track.enabled = isVisible;
     })
