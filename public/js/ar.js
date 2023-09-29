@@ -34,8 +34,9 @@ const initDeepAr = async () => {
 
       oscillator.type = "square";
       oscillator.start()
-      mediaStreamSource.connect(oscillator);
+      mediaStreamSource.connect(mediaStreamDestination);
       oscillator.connect(mediaStreamDestination);
+
 
       const destinationTracks = mediaStreamDestination.stream.getAudioTracks();
       inboundStream.addTrack(destinationTracks[0]);
