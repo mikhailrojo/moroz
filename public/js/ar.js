@@ -4,7 +4,8 @@ const initDeepAr = async () => {
   const deepAR = await deepar.initialize({
     canvas,
     licenseKey: 'f46f49ed78f2a4bfe2d6775a29be434a354fcbb433c8df4d785ef7cb99f092624d56cf84b58c8b9a',
-    effect: 'https://cdn.jsdelivr.net/npm/deepar/effects/aviators',
+    // effect: 'https://cdn.jsdelivr.net/npm/deepar/effects/Shoe',
+    effect: 'model/santa.deepar',
   }).catch(error => {
     console.log(error);
   });
