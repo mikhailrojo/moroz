@@ -1,23 +1,22 @@
 const initDeepAr = async () => {
 
-  console.log({isInitiator});
   const canvas = document.querySelector('canvas');
-
-
   const deepAR = await deepar.initialize({
     canvas,
     licenseKey: 'f46f49ed78f2a4bfe2d6775a29be434a354fcbb433c8df4d785ef7cb99f092624d56cf84b58c8b9a',
-    // previewElement: document.querySelector('#deepar-div'),
     effect: 'https://cdn.jsdelivr.net/npm/deepar/effects/aviators',
   }).catch(error => {
     console.log(error);
   });
 
+  deepAR.callbacks.onFaceVisibilityChanged = (isVisible) => {
+    localStream && localStream.getTracks().forEach(track => {
+      track.enabled = isVisible;
+    })
+  }
   await deepAR.backgroundReplacement(true, 'images/bg.jpeg');
 
-
   const remoteVideo = document.querySelector('#localVideo');
-  console.log('my strem is ready')
   const arStream = canvas.captureStream();
 
   const inboundStream = new MediaStream();
@@ -33,10 +32,6 @@ const initDeepAr = async () => {
 
       const filter = getFilter(audioCtx);
 
-      console.log({filter})
-
-
-
       mediaStreamSource.connect(filter);
 
       filter.connect(mediaStreamDestination);
@@ -50,9 +45,6 @@ const initDeepAr = async () => {
     .catch(console.log);
 
   localStream = inboundStream;
-
-
-
 }
 
 const hannWindow = function (length) {
@@ -122,3 +114,4 @@ const getFilter = (audioContext) => {
 const linearInterpolation = function (a, b, t) {
   return a + (b - a) * t;
 };
+
