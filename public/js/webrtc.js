@@ -98,8 +98,7 @@ function sendMessage(message, room) {
 
 //Displaying Local Stream and Remote Stream on webpage
 const localVideo = document.querySelector('#localVideo');
-localVideo.volume = 0;
-localVideo.muted = 0;
+localVideo.muted = true;
 const remoteVideo = document.querySelector('#remoteVideo');
 
 
