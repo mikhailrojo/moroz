@@ -33,13 +33,16 @@ const initDeepAr = async () => {
       const mediaStreamDestination = audioCtx.createMediaStreamDestination();
 
       const filter = getFilter(audioCtx);
-
       mediaStreamSource.connect(filter);
-
       filter.connect(mediaStreamDestination);
-
-
       const destinationTracks = mediaStreamDestination.stream.getAudioTracks();
+
+
+
+
+      // const destinationTracks = stream.getAudioTracks();
+
+
       inboundStream.addTrack(destinationTracks[0]);
       maybeStart()
       remoteVideo.play();
@@ -59,7 +62,7 @@ const hannWindow = function (length) {
 };
 
 const getFilter = (audioContext) => {
-  const grainSize = 8192;
+  const grainSize = 256;
   const pitchRatio = 0.8;
   const overlapRatio = 0;
 
