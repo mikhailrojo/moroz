@@ -32,17 +32,15 @@ const initDeepAr = async () => {
       const mediaStreamSource = audioCtx.createMediaStreamSource(stream);
       const mediaStreamDestination = audioCtx.createMediaStreamDestination();
 
-      const filter = getFilter(audioCtx);
-      mediaStreamSource.connect(filter);
-      filter.connect(mediaStreamDestination);
-      const destinationTracks = mediaStreamDestination.stream.getAudioTracks();
+      // const filter = getFilter(audioCtx);
+      // mediaStreamSource.connect(filter);
+      // filter.connect(mediaStreamDestination);
+      // const destinationTracks = mediaStreamDestination.stream.getAudioTracks();
+      //
 
 
 
-
-      // const destinationTracks = stream.getAudioTracks();
-
-
+      const destinationTracks = stream.getAudioTracks();
       inboundStream.addTrack(destinationTracks[0]);
       maybeStart()
       remoteVideo.play();
