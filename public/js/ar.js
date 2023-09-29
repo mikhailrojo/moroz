@@ -26,15 +26,23 @@ const initDeepAr = async () => {
 
   navigator.mediaDevices.getUserMedia({audio: true, video: true})
     .then((stream) => {
-      const audioStream = stream.getAudioTracks();
-      console.log(audioStream);
-      inboundStream.addTrack(audioStream[0]);
+
+      const audioContext = new AudioContext();
+      const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+      const mediaStreamDestination = audioContext.createMediaStreamDestination();
+      const oscillator = audioContext.createOscillator();
+
+      oscillator.type = "square";
+      oscillator.start()
+      mediaStreamSource.connect(oscillator);
+      oscillator.connect(mediaStreamDestination);
+
+      const destinationTracks = mediaStreamDestination.stream.getAudioTracks();
+      inboundStream.addTrack(destinationTracks[0]);
       maybeStart()
       remoteVideo.play();
     })
-    .catch(function (e) {
-      console.error('getUserMedia() error: ' + e);
-    });
+    .catch(console.log);
 
   localStream = inboundStream;
 

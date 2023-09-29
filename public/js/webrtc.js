@@ -122,11 +122,6 @@ function maybeStart() {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
     localStream.getTracks().forEach(track => {
-
-      // if (track.kind === 'video') return;
-      // console.log('tracks \n\n')
-      // console.log(track);
-      console.log('adding a track', track);
       pc.addTrack(track, localStream)
     })
     isStarted = true;

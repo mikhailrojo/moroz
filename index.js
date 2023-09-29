@@ -1,12 +1,12 @@
 'use strict';
 
 //Loading dependencies & initializing express
-var os = require('os');
-var express = require('express');
-var app = express();
-var http = require('http');
+const os = require('os');
+const express = require('express');
+const app = express();
+const http = require('http');
 //For signalling in WebRTC
-var socketIO = require('socket.io');
+const socketIO = require('socket.io');
 
 
 app.use(express.static('public'))
@@ -15,11 +15,11 @@ app.get("/", function (req, res) {
   res.render("index.ejs");
 });
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 server.listen(process.env.PORT || 8000);
 
-var io = socketIO(server);
+const io = socketIO(server);
 
 io.sockets.on('connection', function (socket) {
 
@@ -27,7 +27,7 @@ io.sockets.on('connection', function (socket) {
   // Arguments is an array like object which contains all the arguments of log().
   // To push all the arguments of log() in array, we have to use apply().
   function log() {
-    var array = ['Message from server:'];
+    const array = ['Message from server:'];
     array.push.apply(array, arguments);
     socket.emit('log', array);
   }
@@ -43,8 +43,8 @@ io.sockets.on('connection', function (socket) {
   socket.on('create or join', function (room) {
     log('Received request to create or join room ' + room);
 
-    var clientsInRoom = io.sockets.adapter.rooms[room];
-    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+    const clientsInRoom = io.sockets.adapter.rooms[room];
+    const numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
     log('Room ' + room + ' now has ' + numClients + ' client(s)');
 
     if (numClients === 0) {
@@ -64,8 +64,8 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('ipaddr', function () {
-    var ifaces = os.networkInterfaces();
-    for (var dev in ifaces) {
+    const ifaces = os.networkInterfaces();
+    for (const dev in ifaces) {
       ifaces[dev].forEach(function (details) {
         if (details.family === 'IPv4' && details.address !== '127.0.0.1') {
           socket.emit('ipaddr', details.address);
